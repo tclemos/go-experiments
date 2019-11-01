@@ -9,17 +9,24 @@ import (
 	"strings"
 )
 
-type NameObj struct {
-	Name string `json:"name"`
-}
-
 func main() {
 	http.HandleFunc("/", capitalize)
 	go http.ListenAndServe(":8082", nil)
-	o := NameObj{
-		Name: "john doe",
-	}
-	b, _ := json.Marshal(o)
+
+	reqBody := `{
+		"this": "is",
+		"a":    "complex json",
+		"object": {
+			"with": "sub properties",
+			"to":   "be capitalized",
+			"even": {
+				"with" : "multiple sub structures"
+			}
+		},
+		"did": "you get it?"
+	}`
+
+	b := []byte(reqBody)
 	if res, err := http.Post("http://localhost:8082/", "application/json", bytes.NewBuffer(b)); err != nil {
 		fmt.Println(err)
 	} else {
@@ -44,20 +51,34 @@ func capitalize(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("request body:", string(body))
 
-	o := new(NameObj)
-	if err := json.Unmarshal(body, o); err != nil {
+	o := make(map[string]interface{}, 0)
+	if err := json.Unmarshal(body, &o); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid json body"))
 	}
 
-	pp := strings.Split(o.Name, " ")
-
-	for i, p := range pp {
-		pp[i] = fmt.Sprintf("%s%s", strings.ToUpper(p[0:1]), p[1:])
-	}
-
-	o.Name = strings.Join(pp, " ")
+	capitalizeMap(o)
 
 	res, _ := json.Marshal(o)
 	w.Write(res)
+}
+
+func capitalizeMap(m map[string]interface{}) {
+	for k, i := range m {
+
+		switch v := i.(type) {
+		default:
+			continue
+		case string:
+			pp := strings.Split(v, " ")
+
+			for i, p := range pp {
+				pp[i] = fmt.Sprintf("%s%s", strings.ToUpper(p[0:1]), p[1:])
+			}
+
+			m[k] = strings.Join(pp, " ")
+		case map[string]interface{}:
+			capitalizeMap(v)
+		}
+	}
 }
