@@ -35,7 +35,7 @@ func main() {
 			fmt.Println(err)
 		}
 		defer res.Body.Close()
-		fmt.Println("request body:", string(body))
+		fmt.Println("response:", string(body))
 	}
 
 }
@@ -49,7 +49,7 @@ func capitalize(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	fmt.Println("request body:", string(body))
+	fmt.Println("request:", string(body))
 
 	o := make(map[string]interface{}, 0)
 	if err := json.Unmarshal(body, &o); err != nil {
@@ -59,7 +59,7 @@ func capitalize(w http.ResponseWriter, r *http.Request) {
 
 	capitalizeMap(o)
 
-	res, _ := json.Marshal(o)
+	res, _ := json.MarshalIndent(o, "", "\t")
 	w.Write(res)
 }
 
