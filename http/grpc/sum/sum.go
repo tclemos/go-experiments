@@ -3,7 +3,7 @@ package sum
 import (
 	"context"
 
-	"github.com/tclemos/go-experiments/grpc/protocol"
+	"github.com/tclemos/go-experiments/http/grpc/protocol"
 )
 
 type Service struct {
