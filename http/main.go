@@ -8,4 +8,5 @@ import (
 func main() {
 	config.SetupLog()
 	grpc.Run()
+	chi.Run()
 }
