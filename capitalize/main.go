@@ -73,7 +73,7 @@ func capitalizeMap(m map[string]interface{}) {
 			pp := strings.Split(v, " ")
 
 			for i, p := range pp {
-				pp[i] = fmt.Sprintf("%s%s", strings.ToUpper(p[0:1]), p[1:])
+				pp[i] = strings.Title(p)
 			}
 
 			m[k] = strings.Join(pp, " ")
